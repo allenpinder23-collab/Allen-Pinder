@@ -32,7 +32,7 @@ export default function BudgetChart({ categories }: { categories: BudgetCategory
   }));
 
   if (data.length === 0) {
-    return <p className="text-sm text-gray-500">No budget categories available.</p>;
+    return <p className="text-sm text-slate-500">No budget categories available.</p>;
   }
 
   return (

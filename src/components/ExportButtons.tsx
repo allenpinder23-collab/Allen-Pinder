@@ -71,7 +71,7 @@ function ExportButton({
       type="button"
       onClick={onClick}
       disabled={busy}
-      className="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
     >
       {busy ? "Preparing…" : label}
     </button>

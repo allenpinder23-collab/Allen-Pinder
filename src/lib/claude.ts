@@ -60,8 +60,10 @@ const TOOL_NAME = "emit_client_plan";
 
 function buildToolSchema() {
   // Anthropic's tool input_schema wants a plain JSON Schema without the
-  // top-level $schema key; drop it via destructuring.
-  const { $schema: _$schema, ...schema } = z.toJSONSchema(ClientPlanSchema);
+  // top-level $schema key.
+  const fullSchema = z.toJSONSchema(ClientPlanSchema) as Record<string, unknown>;
+  delete fullSchema.$schema;
+  const schema = fullSchema;
   return {
     name: TOOL_NAME,
     description:

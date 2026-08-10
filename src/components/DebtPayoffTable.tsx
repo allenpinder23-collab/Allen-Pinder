@@ -14,34 +14,34 @@ export default function DebtPayoffTable({
 
   return (
     <div>
-      <p className="mb-3 text-sm text-gray-600">
+      <p className="mb-3 text-sm text-slate-600">
         <span className="font-semibold capitalize">{strategy}</span> strategy —{" "}
         {rationale}
       </p>
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-slate-200 text-sm">
+          <thead className="bg-slate-50">
             <tr>
-              <th className="px-3 py-2 text-left font-semibold text-gray-700">Order</th>
-              <th className="px-3 py-2 text-left font-semibold text-gray-700">Creditor</th>
-              <th className="px-3 py-2 text-right font-semibold text-gray-700">Balance</th>
-              <th className="px-3 py-2 text-right font-semibold text-gray-700">APR</th>
-              <th className="px-3 py-2 text-right font-semibold text-gray-700">Recommended payment</th>
+              <th className="px-3 py-2 text-left font-semibold text-slate-700">Order</th>
+              <th className="px-3 py-2 text-left font-semibold text-slate-700">Creditor</th>
+              <th className="px-3 py-2 text-right font-semibold text-slate-700">Balance</th>
+              <th className="px-3 py-2 text-right font-semibold text-slate-700">APR</th>
+              <th className="px-3 py-2 text-right font-semibold text-slate-700">Recommended payment</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-slate-100">
             {sorted.map((d) => (
               <tr key={d.creditor}>
-                <td className="px-3 py-2 text-gray-500">#{d.payoffOrderRank}</td>
-                <td className="px-3 py-2 font-medium text-gray-900">
+                <td className="px-3 py-2 text-slate-500">#{d.payoffOrderRank}</td>
+                <td className="px-3 py-2 font-medium text-slate-900">
                   {d.creditor}
-                  <div className="text-xs font-normal text-gray-500">{d.rationale}</div>
+                  <div className="text-xs font-normal text-slate-500">{d.rationale}</div>
                 </td>
-                <td className="px-3 py-2 text-right text-gray-700">{formatCurrency(d.balance)}</td>
-                <td className="px-3 py-2 text-right text-gray-700">
+                <td className="px-3 py-2 text-right text-slate-700">{formatCurrency(d.balance)}</td>
+                <td className="px-3 py-2 text-right text-slate-700">
                   {d.apr !== undefined ? `${d.apr}%` : "—"}
                 </td>
-                <td className="px-3 py-2 text-right font-medium text-gray-900">
+                <td className="px-3 py-2 text-right font-medium text-slate-900">
                   {formatCurrency(d.recommendedMonthlyPayment)}
                 </td>
               </tr>

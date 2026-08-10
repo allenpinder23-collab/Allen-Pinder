@@ -14,43 +14,43 @@ const STRATEGY_LABELS: Record<NegativeItem["recommendedStrategy"], string> = {
 export default function NegativeItemsTable({ items }: { items: NegativeItem[] }) {
   if (items.length === 0) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-slate-500">
         No negative items were identified in the credit report provided.
       </p>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-gray-200 text-sm">
-        <thead className="bg-gray-50">
+    <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+      <table className="min-w-full divide-y divide-slate-200 text-sm">
+        <thead className="bg-slate-50">
           <tr>
-            <th className="px-3 py-2 text-left font-semibold text-gray-700">Creditor</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-700">Issue</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-700">Strategy</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-700">Priority</th>
-            <th className="px-3 py-2 text-left font-semibold text-gray-700">Notes</th>
+            <th className="px-3 py-2 text-left font-semibold text-slate-700">Creditor</th>
+            <th className="px-3 py-2 text-left font-semibold text-slate-700">Issue</th>
+            <th className="px-3 py-2 text-left font-semibold text-slate-700">Strategy</th>
+            <th className="px-3 py-2 text-left font-semibold text-slate-700">Priority</th>
+            <th className="px-3 py-2 text-left font-semibold text-slate-700">Notes</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-slate-100">
           {items.map((item) => (
             <tr key={item.id}>
-              <td className="px-3 py-2 align-top font-medium text-gray-900">
+              <td className="px-3 py-2 align-top font-medium text-slate-900">
                 {item.creditor}
                 {item.accountType && (
-                  <div className="text-xs font-normal text-gray-500">{item.accountType}</div>
+                  <div className="text-xs font-normal text-slate-500">{item.accountType}</div>
                 )}
               </td>
-              <td className="px-3 py-2 align-top text-gray-700">
+              <td className="px-3 py-2 align-top text-slate-700">
                 {item.description}
-                <div className="mt-1 text-xs text-gray-400">
+                <div className="mt-1 text-xs text-slate-400">
                   Reported by: {item.bureausReporting.join(", ")}
                 </div>
               </td>
-              <td className="px-3 py-2 align-top text-gray-700">
+              <td className="px-3 py-2 align-top text-slate-700">
                 {STRATEGY_LABELS[item.recommendedStrategy]}
                 {item.legalNote && (
-                  <div className="mt-1 text-xs text-gray-400">{item.legalNote}</div>
+                  <div className="mt-1 text-xs text-slate-400">{item.legalNote}</div>
                 )}
               </td>
               <td className="px-3 py-2 align-top">
@@ -61,7 +61,7 @@ export default function NegativeItemsTable({ items }: { items: NegativeItem[] })
                   {item.priority}
                 </span>
               </td>
-              <td className="px-3 py-2 align-top text-xs text-gray-600 max-w-xs">
+              <td className="px-3 py-2 align-top text-xs text-slate-600 max-w-xs">
                 {item.strategyNotes}
               </td>
             </tr>

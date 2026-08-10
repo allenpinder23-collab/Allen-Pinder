@@ -1,9 +1,9 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ClientPlan } from "@/lib/types";
-import { loadPlanFromSession } from "@/lib/planUtils";
+import { prisma } from "@/lib/db";
+import { decryptString } from "@/lib/crypto";
+import { ClientPlanSchema } from "@/lib/types";
+import PageHeader from "@/components/PageHeader";
 import PlanSummaryHeader from "@/components/PlanSummaryHeader";
 import RiskFlags from "@/components/RiskFlags";
 import CreditFactorCards from "@/components/CreditFactorCards";
@@ -14,42 +14,43 @@ import ActionPlanTimeline from "@/components/ActionPlanTimeline";
 import LettersPanel from "@/components/LettersPanel";
 import ExportButtons from "@/components/ExportButtons";
 
-export default function DashboardPage() {
-  const [plan, setPlan] = useState<ClientPlan | null | undefined>(undefined);
+export default async function PlanViewPage({
+  params,
+}: {
+  params: Promise<{ id: string; planId: string }>;
+}) {
+  const { id: clientId, planId } = await params;
 
-  useEffect(() => {
-    // One-time sync read of sessionStorage on mount (client-only store).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPlan(loadPlanFromSession());
-  }, []);
+  const record = await prisma.plan.findFirst({
+    where: { id: planId, clientId },
+    include: { client: { select: { fullName: true } } },
+  });
+  if (!record) notFound();
 
-  if (plan === undefined) {
-    return <main className="flex-1 bg-gray-50 p-8 text-sm text-gray-500">Loading…</main>;
+  const decrypted = decryptString({
+    ciphertext: record.encryptedData,
+    iv: record.iv,
+    authTag: record.authTag,
+  });
+  const parsed = ClientPlanSchema.safeParse(JSON.parse(decrypted));
+  if (!parsed.success) {
+    throw new Error("Stored plan data is corrupted or no longer matches the expected schema.");
   }
-
-  if (plan === null) {
-    return (
-      <main className="flex-1 bg-gray-50 p-8">
-        <p className="text-sm text-gray-600">
-          No plan found in this session. Generate one first.
-        </p>
-        <Link href="/" className="mt-2 inline-block text-sm font-medium text-indigo-600">
-          &larr; Back to upload
-        </Link>
-      </main>
-    );
-  }
+  const plan = parsed.data;
 
   return (
-    <main className="flex-1 bg-gray-50 pb-16">
-      <div className="mx-auto max-w-5xl px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="text-sm font-medium text-indigo-600">
-            &larr; New plan
+    <>
+      <PageHeader
+        title={`Plan — ${record.client.fullName}`}
+        description={
+          <Link href={`/clients/${clientId}`} className="text-indigo-600 hover:text-indigo-500">
+            &larr; Back to client
           </Link>
-          <ExportButtons plan={plan} />
-        </div>
+        }
+        action={<ExportButtons plan={plan} />}
+      />
 
+      <div className="flex-1 space-y-6 px-6 py-6 md:px-8">
         <PlanSummaryHeader plan={plan} />
         <RiskFlags flags={plan.riskFlags} />
 
@@ -81,25 +82,25 @@ export default function DashboardPage() {
           <LettersPanel letters={plan.letters} />
         </Section>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <h3 className="text-xs font-semibold text-gray-700">Disclaimers</h3>
-          <ul className="mt-1 list-disc pl-4 space-y-0.5">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <h3 className="text-xs font-semibold text-slate-700">Disclaimers</h3>
+          <ul className="mt-1 list-disc space-y-0.5 pl-4">
             {plan.disclaimers.map((d, i) => (
-              <li key={i} className="text-xs text-gray-500">
+              <li key={i} className="text-xs text-slate-500">
                 {d}
               </li>
             ))}
           </ul>
         </div>
       </div>
-    </main>
+    </>
   );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
         {title}
       </h2>
       {children}

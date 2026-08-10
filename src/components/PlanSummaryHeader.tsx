@@ -3,19 +3,19 @@ import { formatCurrency, formatDate } from "@/lib/format";
 
 export default function PlanSummaryHeader({ plan }: { plan: ClientPlan }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">
+          <h1 className="text-xl font-bold text-slate-900">
             {plan.clientName ? `${plan.clientName}'s Plan` : "Client Plan"}
           </h1>
-          <p className="text-xs text-gray-500">Generated {formatDate(plan.generatedDate)}</p>
+          <p className="text-xs text-slate-500">Generated {formatDate(plan.generatedDate)}</p>
         </div>
         <div className="text-right">
           <p className="text-2xl font-bold text-indigo-600">
             +{plan.targetScoreIncrease} pts
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-500">
             target over {plan.targetTimeframeMonths} months
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function PlanSummaryHeader({ plan }: { plan: ClientPlan }) {
         />
       </div>
 
-      <p className="mt-4 text-sm text-gray-700">{plan.executiveSummary}</p>
+      <p className="mt-4 text-sm text-slate-700">{plan.executiveSummary}</p>
     </div>
   );
 }
@@ -48,11 +48,11 @@ function Stat({
 }) {
   return (
     <div>
-      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-xs text-slate-500">{label}</p>
       <p
         className={`text-lg font-semibold ${
           positive === undefined
-            ? "text-gray-900"
+            ? "text-slate-900"
             : positive
               ? "text-green-600"
               : "text-red-600"

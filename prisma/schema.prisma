@@ -1,0 +1,109 @@
+// Credit & Budget Builder — data model
+// SQLite for zero-config local/dev use; swap the datasource to postgresql
+// for production by changing `provider` and `DATABASE_URL`.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  advisor
+}
+
+enum ClientStatus {
+  active
+  paused
+  completed
+  archived
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  name                String
+  passwordHash        String
+  role                UserRole  @default(advisor)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime  @default(now())
+
+  sessions       Session[]
+  clientsCreated Client[]   @relation("ClientCreatedBy")
+  plansGenerated Plan[]     @relation("PlanGeneratedBy")
+  auditLogs      AuditLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Client {
+  id        String       @id @default(cuid())
+  fullName  String
+  email     String?
+  phone     String?
+  status    ClientStatus @default(active)
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  createdById String
+  createdBy   User   @relation("ClientCreatedBy", fields: [createdById], references: [id])
+
+  plans Plan[]
+
+  @@index([createdById])
+}
+
+// The full ClientPlan JSON is stored encrypted (AES-256-GCM) — see src/lib/crypto.ts.
+// We deliberately do NOT persist the raw extracted document text, only the
+// derived structured plan, to minimize how much raw PII lives at rest.
+model Plan {
+  id       String @id @default(cuid())
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  generatedById String
+  generatedBy   User   @relation("PlanGeneratedBy", fields: [generatedById], references: [id])
+
+  encryptedData String
+  iv            String
+  authTag       String
+
+  // Duplicated in plaintext for list views / sorting so we don't have to
+  // decrypt every row just to render a roster table.
+  scoreRangeLabel String?
+  monthlyCashFlow Float?
+  targetIncrease  Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  targetType String?
+  targetId   String?
+  metadata   String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+}

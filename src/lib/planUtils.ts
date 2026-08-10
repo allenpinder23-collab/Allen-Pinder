@@ -55,21 +55,3 @@ export function countByPriority(plan: ClientPlan) {
     { high: 0, medium: 0, low: 0 }
   );
 }
-
-const PLAN_STORAGE_KEY = "creditagent.clientPlan";
-
-export function savePlanToSession(plan: ClientPlan) {
-  if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(PLAN_STORAGE_KEY, JSON.stringify(plan));
-}
-
-export function loadPlanFromSession(): ClientPlan | null {
-  if (typeof window === "undefined") return null;
-  const raw = window.sessionStorage.getItem(PLAN_STORAGE_KEY);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as ClientPlan;
-  } catch {
-    return null;
-  }
-}
