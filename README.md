@@ -8,6 +8,25 @@ payoff plan, and a month-by-month 6-month action plan working toward a
 **+200 point credit score goal**. Every plan is stored per client, encrypted
 at rest, so advisors can track a client's history over time.
 
+## Run it right now (3 commands)
+
+You need [Node.js](https://nodejs.org) installed and a Claude API key from
+[console.anthropic.com](https://console.anthropic.com). Then:
+
+```bash
+git clone https://github.com/allenpinder23-collab/Allen-Pinder.git
+cd Allen-Pinder && git checkout claude/fintech-credit-agent-t4m9fq
+npm run quickstart
+```
+
+It'll ask for your email, a password, and your Anthropic API key, then set
+everything up and start the app at **http://localhost:3000**. Log in with
+what you just entered.
+
+(This has to run on a machine you control — a laptop, or your own server.
+It can't run "in the cloud" for free without you connecting a hosting
+account like Vercel; see Deploying below for that.)
+
 ## What it does
 
 1. **Sign in** (`/login`) — advisor/staff accounts only; no client
@@ -114,17 +133,20 @@ prompt, dashboard, and exports — never a promise. Keep it that way;
 guaranteeing specific credit outcomes to consumers carries real legal risk
 under CROA even outside a formal CRO relationship.
 
-## Setup
+## Manual setup
+
+`npm run quickstart` (above) does all of this for you. Use these steps
+instead if you want to set your own env vars by hand, or you're setting up
+a second machine that already has a `.env`:
 
 ```bash
 npm install
 
-# Generates prisma/dev.db and applies the schema
-npm run db:migrate
+# Set the environment variables in .env (see table below) — copy
+# .env.example to .env and fill it in.
 
-# Set required environment variables in .env (see table below), then:
-npm run db:seed   # creates your first admin login from ADMIN_EMAIL/ADMIN_PASSWORD
-
+npm run db:migrate   # creates prisma/dev.db and applies the schema
+npm run db:seed      # creates your first admin login from ADMIN_EMAIL/ADMIN_PASSWORD
 npm run dev
 ```
 
@@ -144,6 +166,40 @@ Open http://localhost:3000 — you'll land on `/login`.
 
 Sign in as an admin and go to `/settings/users` to create additional
 advisor or admin accounts. There's no self-service signup by design.
+
+## Deploying (getting a real, permanent URL)
+
+Running it locally only gets you `localhost` — fine for testing, not for
+sharing with staff or clients. To get a real `https://` URL:
+
+1. **Database**: create a free Postgres database at
+   [neon.tech](https://neon.tech) or [supabase.com](https://supabase.com).
+   Copy its connection string.
+2. In `prisma/schema.prisma`, change:
+   ```prisma
+   datasource db {
+     provider = "postgresql"   // was "sqlite"
+     url      = env("DATABASE_URL")
+   }
+   ```
+   Commit that change, then run `npx prisma migrate deploy` once against
+   the new `DATABASE_URL` to create the tables.
+3. **Hosting**: go to [vercel.com](https://vercel.com), sign up/log in,
+   click **Add New → Project**, and import the
+   `allenpinder23-collab/Allen-Pinder` repo on branch
+   `claude/fintech-credit-agent-t4m9fq`.
+4. Under **Environment Variables**, add everything from `.env.example`:
+   `DATABASE_URL` (your Postgres URL from step 1), `ENCRYPTION_KEY`
+   (`openssl rand -hex 32`), `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
+5. Click **Deploy**. Vercel gives you a URL like
+   `https://allen-pinder.vercel.app`.
+6. Run the seed script once against production to create your admin login:
+   `ADMIN_EMAIL=... ADMIN_PASSWORD=... DATABASE_URL=<prod url> npm run db:seed`
+   from your own machine (this writes directly to the production database).
+
+I can't do steps 3–5 myself — they require an account only you can create —
+but I can prep everything else (the schema change, checking the build
+passes against Postgres) if you want to go this route. Just say the word.
 
 ## Limitations to know about
 
