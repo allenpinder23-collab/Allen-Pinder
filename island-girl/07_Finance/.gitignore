@@ -1,0 +1,4 @@
+# Bank statements and card data stay local only
+*
+!.gitignore
+!.gitkeep
